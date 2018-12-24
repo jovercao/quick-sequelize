@@ -1,0 +1,51 @@
+{
+  "name": "User",
+  "dbName": "users",
+  "label": "用户表",
+  "fields": [
+    {
+      "name": "userCode",
+      "dbName": "userCode",
+      "label": "用户编码",
+      "type": "code",
+      "format": "[0-9]{5}"
+    },
+    {
+      "name": "username",
+      "type": "string",
+      "length": 100
+    },
+    {
+      "name": "password",
+      "length": 256,
+      "type": "string"
+    },
+    {
+      "name": "birthday",
+      "type": "date"
+    },
+    {
+      "name": "IsPage",
+      "type": "uuid",
+      "auto": true
+    }
+  ],
+  "primaryKey": [
+    "userId"
+  ],
+  "associate": [
+    {
+      "name": "sex",
+      "label": "性别",
+      "type": "hasOne",
+      "model": "Sex",
+      "nullable": true,
+      "foreignKey": [
+        "sexId"
+      ],
+      "targetKey": [
+        "id"
+      ]
+    }
+  ]
+}

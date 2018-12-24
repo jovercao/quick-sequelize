@@ -1,7 +1,7 @@
 // const Sequelize = require('sequelize')
 // const DataTypes = Sequelize.DataTypes
 // const Module = require('sequelize/lib/model')
-const DB = require('../lib/db')
+const Sequelize = require('../index')
 const assert = require('assert')
 
 // describe.skip('Sequelize 查询测试', function () {
@@ -44,7 +44,8 @@ const assert = require('assert')
 
 describe('db CRUD/Query 测试', function() {
   before(function () {
-    this.db = new DB('mssql://sa:124578@localhost/j3')
+    this.db = new Sequelize('mssql://sa:124578@localhost/j3')
+    this.q = this.db.sql;
     // const User = this.db.define(
     //   'User',
     //   {
@@ -62,30 +63,37 @@ describe('db CRUD/Query 测试', function() {
   });
 
   it('C', async function() {
-    const ret = await this.db.insert('users', { username: '$', password: 'efg', createdAt: new Date(), updatedAt: new Date() })
+    const ret = await this.q.insert('users', { username: '$', password: 'efg', createdAt: new Date(), updatedAt: new Date() })
     console.dir(ret)
   })
   
   it('R', async function() {
-    const ret = await this.db.select('users', [ 'username', 'password' ], { username: '$'})
+    const ret = await this.q.select('users', [ 'username', 'password' ], { username: '$'})
     console.dir(ret)
   })
 
   it('U', async function() {
-    const ret = await this.db.update('users', { username: '#', password: 'efg', updatedAt: new Date() }, { username: '$' })
+    const ret = await this.q.update('users', { username: '#', password: 'efg', updatedAt: new Date() }, { username: '$' })
     console.dir(ret)
   })
 
   it('D', async function() {
-    const ret = await this.db.delete('users', { username: '#' })
+    const ret = await this.q.delete('users', { username: '#' })
     console.dir(ret)
   })
 
   it('Query', async function() {
-    const ret = await this.db.query`select * set password = 'x'`
-    console.dir(ret)
-    const ret = await this.db.query`update users set password = 'x'`
-    console.dir(ret)
+    const trans = await this.q.trans(this.q.SERIALIZABLE)
+    try {
+      let ret = await this.q.query`select * from users`
+      console.dir(ret)
+      ret = await this.q.query`update users set password = 'x'`
+      console.dir(ret)
+      trans.commit();
+    } catch(err) {
+      trans.rollback();
+      throw err;
+    }
   })
 
   after(async function() {

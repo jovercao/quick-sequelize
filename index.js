@@ -1,1 +1,1 @@
-module.exports = requrie('./lib/db.js')
+module.exports = require('./lib/sequelize.js')
